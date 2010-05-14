@@ -1,0 +1,54 @@
+Easy to use:
+Just include the class file and it automatically replace the default error handler!
+
+
+You can turn the display of error infos off & on at runtine, using
+	debug::$on = false;
+	debug::$on = true;
+You can use it anytime in you code ;)
+
+To use the chrono:
+debug::chrono(); // set the timer
+debug::chrono('your message'); // display your message & time elapsed since last chrono call
+debug::chrono(true); // display a table with all messages & times
+
+You can also use several chrono at the same time by passing chrono name as second argument:
+debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
+usleep( 5000 );
+debug::chrono( null, 'chrono2' ); // set the timer of chrono 2
+
+debug::chrono( 'your message 1', 'chrono1' ); // display your message & time elapsed since last chrono 1 call
+usleep( 5000 );
+debug::chrono( 'your message 2', 'chrono2' ); // display your message & time elapsed since last chrono 2 call
+
+debug::chrono( true, 'chrono1' ); // display a table with all messages & times of chrono 1
+debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
+
+
+Error display template:
+----------------------------------------------------------------------
+[Error Type]: [Full Error message] in [path and filename] on line xxx
+Stack trace:
+#0 [path and filename](xxx): [code where error occured]
+#1 [path and filename](xxx): [Function call backtrace]
+#2 [path and filename](xxx): [Function call backtrace]
+#3 {main}
+Context:
+$var1 = [value];
+$var2 = [value];
+...
+
+
+Chrono display example:
+----------------------------------------------------------------------
+ -> message 1: x.xxxs
+ -> message 2: x.xxxs
+ -> message n: x.xxxs
+
+chrono [name]
+-------------------------------------------------------
+ unit - action                                 duration
+-------------------------------------------------------
+    1 - message 1                                x.xxxs
+ x.xx - message 2                                x.xxxs
+ x.xx - message n                                x.xxxs
