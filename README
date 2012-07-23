@@ -1,5 +1,5 @@
-Easy to use:
-Just include the class file and it automatically replace the default error & exception handlers!
+## How to use it
+Easy, just include the class file and it automatically replace the default error & exception handlers!
 
 To turn the display of error, logs and chrono on & off at runtine:
 ```php
@@ -20,6 +20,7 @@ To use the chrono:
 	Debug::chrono('your message'); // display your message & time elapsed since last chrono call
 	Debug::chrono(true); // display a table with all messages & times
 ```
+
 Use several chrono at the same time by passing chrono name as second argument:
 ```php
 	Debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
@@ -33,8 +34,14 @@ Use several chrono at the same time by passing chrono name as second argument:
 	Debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
 ```
 
-Error display template:
-----------------------------------------------------------------------
+Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers:
+```php
+	Debug::register( false );
+	// and of course register it again
+	Debug::register(); 
+```
+
+### Error display template:
 <pre>
 [Error Type]: [Full Error message] in [path and filename] on line xxx
 Stack trace:
@@ -48,10 +55,9 @@ $var2 = [value];
 ...
 </pre>
 
-Chrono display template:
-----------------------------------------------------------------------
+### Chrono display template:
 <pre>
- chrono init
+ chrono init [name]
  -> message 1: x.xxxs
  -> message 2: x.xxxs
  -> message n: x.xxxs
@@ -65,10 +71,3 @@ chrono table [name]
  x.xx - message 2                                x.xxxs
  x.xx - message n                                x.xxxs
 </pre>
-
-Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers:
-```php
-	Debug::register( false );
-	// and of course register it again
-	Debug::register(); 
-```
