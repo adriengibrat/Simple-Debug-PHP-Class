@@ -1,13 +1,6 @@
 ## How to use it
 Easy, just include the class file and it automatically replace the default error & exception handlers!
 
-To turn the display of error, logs and chrono on & off at runtine:
-```php
-	Debug::reporting( false ); // turn off
-	// Activate debug and show all error informations (stack trace and context) on given error level
-	Debug::reporting( E_ALL ); 
-```
-
 To log any message / variable / data:
 ```php
 	Debug::log( 'message', $var1, $var2, ... ); // log as much data as you want
@@ -32,6 +25,20 @@ Use several chrono at the same time by passing chrono name as second argument:
 
 	Debug::chrono( true, 'chrono1' ); // display a table with all messages & times of chrono 1
 	Debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
+```
+
+There is also (very) short alias functions:
+```php
+	l() === Debug::log();
+	d() === Debug::dump();
+	c() === Debug::chrono();
+```
+
+To turn the display of error, logs and chrono on & off at runtine:
+```php
+	Debug::reporting( false ); // turn off
+	// Activate debug and show all error informations (stack trace and context) on given error level
+	Debug::reporting( E_ALL ); 
 ```
 
 Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers:
