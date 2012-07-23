@@ -138,6 +138,7 @@ class Debug {
 		, 'trace'       => 'border-left:1px solid #ccc;padding-left:1em'
 		, 'scope'       => 'padding:.2em .8em;color:#666'
 		, 'var'         => 'padding-left:1em'
+		, 'log'         => 'border-bottom:1px dashed #999'
 		, 'chrono'      => 'border-left:2px solid #ccc'
 		, 'init'        => 'color:#4A6'
 		, 'time'        => 'color:#284'
