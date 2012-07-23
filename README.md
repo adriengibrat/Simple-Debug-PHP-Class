@@ -1,14 +1,14 @@
 ## How to use it
 Easy, just include the class file and it automatically replace the default error & exception handlers!
 
-To log any message / variable / data:
+Log any message / variable / data.
 ```php
 <?php
 Debug::log( 'message', $var1, $var2, ... ); // log as much data as you want
 Debug::dump( 'message', $var1, $var2, ... ); // log and exit
 ```
 
-To use the chrono:
+Use and display chrono.
 ```php
 <?php
 Debug::chrono(); // set the timer
@@ -16,7 +16,7 @@ Debug::chrono('your message'); // display your message & time elapsed since last
 Debug::chrono(true); // display a table with all messages & times
 ```
 
-Use several chrono at the same time by passing chrono name as second argument:
+Use several chrono at the same time by passing chrono name as second argument.
 ```php
 <?php
 Debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
@@ -30,14 +30,14 @@ Debug::chrono( true, 'chrono1' ); // display a table with all messages & times o
 Debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
 ```
 
-There is also (very) short alias functions:
+There is also (very) short alias functions.
 <pre>
 	l() === Debug::log();
 	d() === Debug::dump();
 	c() === Debug::chrono();
 </pre>
 
-To turn the display of error, logs and chrono on & off at runtine:
+Turn the display of error, logs and chrono on & off at runtine.
 ```php
 <?php
 Debug::reporting( false ); // turn off
@@ -45,7 +45,7 @@ Debug::reporting( false ); // turn off
 Debug::reporting( E_ALL ); 
 ```
 
-Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers:
+Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers.
 ```php
 <?php
 Debug::register( false );
@@ -53,7 +53,7 @@ Debug::register( false );
 Debug::register(); 
 ```
 
-### Error display template:
+### Error display template
 <pre>
 [Error Type]: [Full Error message] in [path and filename] on line xxx
 Stack trace:
@@ -67,7 +67,7 @@ $var2 = [value];
 ...
 </pre>
 
-### Chrono display template:
+### Chrono display template
 <pre>
  chrono init [name]
  -> message 1: x.xxxs
