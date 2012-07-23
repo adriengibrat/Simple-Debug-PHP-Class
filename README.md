@@ -52,7 +52,7 @@ Debug::$style[ 'debug' ]  = 'font-size:2em'; // Applied on all displayed items
 Debug::$style[ 'error' ]  = 'border:1px solid red'; // Custom style on error
 Debug::$style[ 'log' ]    = 'border:1px solid #blue'; // Custom style on log
 Debug::$style[ 'chrono' ] = 'border:1px solid #green'; // Custom style on chrono
-// See source to complete list of styles
+// See source for complete list of styles
 ```
 
 Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers.
