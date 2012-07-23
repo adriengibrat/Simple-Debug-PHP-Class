@@ -3,49 +3,54 @@ Easy, just include the class file and it automatically replace the default error
 
 To log any message / variable / data:
 ```php
-	Debug::log( 'message', $var1, $var2, ... ); // log as much data as you want
-	Debug::dump( 'message', $var1, $var2, ... ); // log and exit
+<?php
+Debug::log( 'message', $var1, $var2, ... ); // log as much data as you want
+Debug::dump( 'message', $var1, $var2, ... ); // log and exit
 ```
 
 To use the chrono:
 ```php
-	Debug::chrono(); // set the timer
-	Debug::chrono('your message'); // display your message & time elapsed since last chrono call
-	Debug::chrono(true); // display a table with all messages & times
+<?php
+Debug::chrono(); // set the timer
+Debug::chrono('your message'); // display your message & time elapsed since last chrono call
+Debug::chrono(true); // display a table with all messages & times
 ```
 
 Use several chrono at the same time by passing chrono name as second argument:
 ```php
-	Debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
-	Debug::chrono( null, 'chrono2' ); // set the timer of chrono 2
-	usleep( 5000 );
-	Debug::chrono( 'your message 1', 'chrono1' ); // display your message & time elapsed since last chrono 1 call
-	usleep( 5000 );
-	Debug::chrono( 'your message 2', 'chrono2' ); // display your message & time elapsed since last chrono 2 call
+<?php
+Debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
+Debug::chrono( null, 'chrono2' ); // set the timer of chrono 2
+usleep( 5000 );
+Debug::chrono( 'your message 1', 'chrono1' ); // display your message & time elapsed since last chrono 1 call
+usleep( 5000 );
+Debug::chrono( 'your message 2', 'chrono2' ); // display your message & time elapsed since last chrono 2 call
 
-	Debug::chrono( true, 'chrono1' ); // display a table with all messages & times of chrono 1
-	Debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
+Debug::chrono( true, 'chrono1' ); // display a table with all messages & times of chrono 1
+Debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
 ```
 
 There is also (very) short alias functions:
-```php
+<pre>
 	l() === Debug::log();
 	d() === Debug::dump();
 	c() === Debug::chrono();
-```
+</pre>
 
 To turn the display of error, logs and chrono on & off at runtine:
 ```php
-	Debug::reporting( false ); // turn off
-	// Activate debug and show all error informations (stack trace and context) on given error level
-	Debug::reporting( E_ALL ); 
+<?php
+Debug::reporting( false ); // turn off
+// Activate debug and show all error informations (stack trace and context) on given error level
+Debug::reporting( E_ALL ); 
 ```
 
 Debug registers custom error & exception handlers (on file inclusion), to unregister custom handlers:
 ```php
-	Debug::register( false );
-	// and of course register it again
-	Debug::register(); 
+<?php
+Debug::register( false );
+// and of course register it again
+Debug::register(); 
 ```
 
 ### Error display template:
