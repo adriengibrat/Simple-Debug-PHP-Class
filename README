@@ -7,7 +7,6 @@ To turn the display of error, logs and chrono on & off at runtine:
 	// Activate debug and show all error informations (stack trace and context) on given error level
 	Debug::reporting( E_ALL ); 
 ```
-Use it anytime in you code ;)
 
 To log any message / variable / data:
 ```php
@@ -16,11 +15,12 @@ To log any message / variable / data:
 ```
 
 To use the chrono:
+```php
 	Debug::chrono(); // set the timer
 	Debug::chrono('your message'); // display your message & time elapsed since last chrono call
 	Debug::chrono(true); // display a table with all messages & times
 ```
-To use several chrono at the same time by passing chrono name as second argument:
+Use several chrono at the same time by passing chrono name as second argument:
 ```php
 	Debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
 	Debug::chrono( null, 'chrono2' ); // set the timer of chrono 2
@@ -34,8 +34,8 @@ To use several chrono at the same time by passing chrono name as second argument
 ```
 
 Error display template:
-<pre>
 ----------------------------------------------------------------------
+<pre>
 [Error Type]: [Full Error message] in [path and filename] on line xxx
 Stack trace:
 #0 [path and filename](xxx): [code where error occured]
