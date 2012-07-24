@@ -22,9 +22,9 @@ Use several chrono at the same time by passing chrono name as second argument.
 Debug::chrono( null, 'chrono1' ); // set the timer of chrono 1
 Debug::chrono( null, 'chrono2' ); // set the timer of chrono 2
 usleep( 5000 );
-Debug::chrono( 'your message 1', 'chrono1' ); // display your message & time elapsed since last chrono 1 call
+Debug::chrono( 'your message 1', 'chrono1' ); // display message & time since last chrono 1 call
 usleep( 5000 );
-Debug::chrono( 'your message 2', 'chrono2' ); // display your message & time elapsed since last chrono 2 call
+Debug::chrono( 'your message 2', 'chrono2' ); // display message & time since last chrono 2 call
 
 Debug::chrono( true, 'chrono1' ); // display a table with all messages & times of chrono 1
 Debug::chrono( true, 'chrono2' ); // display a table with all messages & times of chrono 2
