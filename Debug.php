@@ -9,7 +9,7 @@ class Debug {
 	static public    function log () {
 		self::$reporting && 
 			print( 
-				PHP_EOL . '<pre class="debug log">'
+				self::style() . PHP_EOL . '<pre class="debug log">'
 				. implode( 
 					'</pre>' . PHP_EOL . '<pre class="log">' 
 					, array_map( 'Debug::var_export', func_get_args() )
@@ -123,8 +123,8 @@ class Debug {
 		self::handler( -1, $msg, $exception->getFile(), $exception->getLine(), null, $exception->getTrace() );
 	}
 	static public    $style     = array(
-		'debug'         => 'font-size:1em'
-		, 'error'       => 'background:#eee;padding:.5em'
+		'debug'         => 'font-size:1em;padding:.5em;border-radius:5px'
+		, 'error'       => 'background:#eee'
 		, 'exception'   => 'color:#825'
 		//, 'parse'       => 'color:#F07'
 		//, 'compile'     => 'color:#F70'
@@ -137,8 +137,8 @@ class Debug {
 		, 'stack'       => 'padding:.2em .8em;color:#444'
 		, 'trace'       => 'border-left:1px solid #ccc;padding-left:1em'
 		, 'scope'       => 'padding:.2em .8em;color:#666'
-		, 'var'         => 'padding-left:1em'
-		, 'log'         => 'border-bottom:1px dashed #999'
+		, 'var'         => 'border-bottom:1px dashed #aaa;margin-top:-.5em;padding-bottom:.9em'
+    , 'log'         => 'background:#f7f7f7;color:#33e'
 		, 'chrono'      => 'border-left:2px solid #ccc'
 		, 'init'        => 'color:#4A6'
 		, 'time'        => 'color:#284'
@@ -173,7 +173,7 @@ class Debug {
 				return;
 		$context[] = PHP_EOL . '<div class="stack"><i>Stack trace</i> :';
 		foreach ( $stack as $index => $call )
-			$context[] = sprintf( '  <span class="trace">#%s %s: %s%s%s(%s)</span>'
+			$context[] = sprintf( '  <span class="trace">#%s %s: <b>%s%s%s</b>(%s)</span>'
 				, $index
 				, isset( $call[ 'file' ] )  ? $call[ 'file' ] . ' (' . $call[ 'line' ] . ')' : '[internal function]'
 				, isset( $call[ 'class' ] ) ? $call[ 'class' ]                              : ''
@@ -183,35 +183,45 @@ class Debug {
 			);
 		$context[] = '  <span class="trace">#' . ( $index + 1 ) . ' {main}</span>'; 
 		$context[] = '</div><div class="scope"><i>Scope</i> :';
+    $vars = '';
 		if ( isset( $scope['GLOBALS'] ) )
-			$context[] = '  GLOBAL';
+			$vars = '  GLOBAL';
 		elseif ( ! $scope )
-			$context[] = '  NONE';
+			$vars = '  NONE';
 		else
 			foreach ( (array) $scope as $name => $value )
-				$context[] = '  <span class="var">$' . $name .' = ' . self::var_export( $value ) . ';</span>';
-		$context[] = '</div>';
+				$vars .= '  <div class="var">$' . $name .' = ' . self::var_export( $value ) . ';' . PHP_EOL . '</div>';
+		$context[] = $vars . '</div>';
 		return implode( PHP_EOL, $context );
 	}
 	static protected function var_export ( $var ) {
-		$export = var_export( $var, true );
-		if ( is_scalar( $var ) )
-				return $export;
-		if ( is_object( $var ) ) {
-			$pattern = '#::__set_state\(array(\((?:[^()]+|(?1))*\))\)#m';
-			while ( preg_match( $pattern, $export ) )
-				$export = preg_replace( $pattern, ' $1', $export );
-		}
-		$export = preg_replace( '#\(\s+\)#m','()', $export );
-		$export = preg_replace( '# =>\s+#m',' => ', $export );
-		return preg_replace( '#,(\s+\))#m','$1', $export );
+    ob_start();
+    var_dump( $var );
+    $export = ob_get_clean();
+    $export = preg_replace( '/\s*\bNULL\b/m', ' null', $export );
+    $export = preg_replace( '/\s*\bbool\((true|false)\)/m', ' $1', $export );
+    $export = preg_replace( '/\s*\bint\((\d+)\)/m', ' $1', $export );
+    $export = preg_replace( '/\s*\bfloat\(([\d.e-]+)\)/mi', ' $1', $export );
+    $export = preg_replace( '/\s*\bstring\(\d+\) /m', '', $export );
+    $export = preg_replace( '/object\((\w+)\)(#\d+ \(\d+\))/m', '$1$2', $export );
+    $export = preg_replace( '/=>\s*/m', '=> ', $export );
+    $export = preg_replace( '/\[([\w": ]+)\]/', '$1 ', $export );
+    $export = preg_replace( '/\{\s+\}/m', '{}', $export );
+    $export = preg_replace( '/\s+$/m', '', $export );
+    return $export;
 	}
 	static protected function simple_export ( $var ) {
-		if ( is_array( $var ) )
-			return 'array(' . self::args_export( $var ) . ')';
-		$export = var_export( $var, true );
+    $export = self::var_export( $var );
+		if ( is_array( $var ) ) {
+      $export  = preg_replace( '/\s+\d+ => /m', ', ', $export );
+      $export  = preg_replace( '/\s+(["\w]+ => )/m', ', $1', $export );
+      $pattern = '#array\(\d+\) \{[\s,]*([^{}]+|(?R))*?\s+\}#m';
+      while ( preg_match( $pattern, $export ) )
+        $export  = preg_replace( $pattern, 'array($1)', $export );
+      return $export;
+    }
 		if ( is_object( $var ) )
-			return 'object(' . strstr( $export, '::', true ) . ')';
+			return strstr( $export, '#', true );
 		return $export;
 	}
 	static protected function args_export ( $args ) {
@@ -222,12 +232,18 @@ class Debug {
 	}
 }
 Debug::register();
-function l () {
-	call_user_func_array( 'Debug::log', func_get_args() );
+if ( ! function_exists( 'l' ) ) {
+  function l () {
+    call_user_func_array( 'Debug::log', func_get_args() );
+  }
 }
-function d () {
-	call_user_func_array( 'Debug::dump', func_get_args() );
+if ( ! function_exists( 'd' ) ) {
+  function d () {
+  	call_user_func_array( 'Debug::dump', func_get_args() );
+  }
 }
-function c () {
-	call_user_func_array( 'Debug::chrono', func_get_args() );
+if ( ! function_exists( 'c' ) ) {
+  function c () {
+  	call_user_func_array( 'Debug::chrono', func_get_args() );
+  }
 }
