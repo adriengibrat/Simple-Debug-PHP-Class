@@ -1,4 +1,6 @@
 <?php
+defined('E_DEPRECATED') || define('E_DEPRECATED', 8192);
+defined('E_USER_DEPRECATED') || define('E_USER_DEPRECATED', 16384);
 class Debug {
 	static protected $reporting = E_ALL;
 	static public    function reporting ( $reporting = null ) {
@@ -7,19 +9,21 @@ class Debug {
 		self::$reporting = $reporting;
 	}
 	static public    function log () {
+    $args = func_get_args();
 		self::$reporting && 
 			print( 
 				self::style() . PHP_EOL . '<pre class="debug log">'
 				. implode( 
 					'</pre>' . PHP_EOL . '<pre class="log">' 
-					, array_map( 'Debug::var_export', func_get_args() )
+					, array_map( 'Debug::var_export', $args )
 				)
 				. '</pre>'
 			);
 	}
 	static public    function dump () {
+    $args = func_get_args();
 		self::$reporting && 
-			die( call_user_func_array( 'Debug::log', func_get_args() ) );
+			die( call_user_func_array( 'Debug::log', $args ) );
 	}
 	static private   $time;
 	static private   $chrono;
@@ -59,16 +63,16 @@ class Debug {
 		if ( $init) {
 			if ( ! self::$registered )
 				self::$registered = array(
-					'error_reporting'  => error_reporting()
-					, 'display_errors' => ini_get( 'display_errors' )
-					, 'shutdown'       => register_shutdown_function( 'Debug::shutdown' )
+					'display_errors'    => ini_get( 'display_errors' )
+          , 'error_reporting' => error_reporting()
+					, 'shutdown'        => register_shutdown_function( 'Debug::shutdown' )
 				);
 			self::$registered[ 'shutdown' ] = true;
 			error_reporting( E_ALL );
 			set_error_handler( 'Debug::handler', E_ALL );
 			set_exception_handler( 'Debug::exception' );
 			ini_set( 'display_errors', 0 );
-		} else if ( self::$registered ) {
+		} elseif ( self::$registered ) {
 			self::$registered[ 'shutdown' ] = false;
 			error_reporting( self::$registered[ 'error_reporting' ] );
 			restore_error_handler();
@@ -81,14 +85,14 @@ class Debug {
 		, E_ERROR             => 'Fatal'
 		, E_RECOVERABLE_ERROR => 'Recoverable'
 		, E_WARNING           => 'Warning'
-		//, E_PARSE             => 'Parse'
+		, E_PARSE             => 'Parse'
 		, E_NOTICE            => 'Notice'
 		, E_STRICT            => 'Strict'
 		, E_DEPRECATED        => 'Deprecated'
 		, E_CORE_ERROR        => 'Fatal'
 		, E_CORE_WARNING      => 'Warning'
-		//, E_COMPILE_ERROR     => 'Compile Fatal'
-		//, E_COMPILE_WARNING   => 'Compile Warning'
+		, E_COMPILE_ERROR     => 'Compile Fatal'
+		, E_COMPILE_WARNING   => 'Compile Warning'
 		, E_USER_ERROR        => 'Fatal'
 		, E_USER_WARNING      => 'Warning'
 		, E_USER_NOTICE       => 'Notice'
@@ -99,11 +103,11 @@ class Debug {
 		$php_errormsg = preg_replace( '~^.*</a>\]: +(?:\([^\)]+\): +)?~', null, $message ); // clean useless infos
 		if ( ! self::$reporting ) // de-activate
 			return false;
-		$stack = $stack ?: array_slice( debug_backtrace( false ),  $type & E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE ?  2 : 1 ); // clean stack depending if error is user triggered or not
+		$stack = $stack ? $stack : array_slice( debug_backtrace( false ),  $type & E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE ?  2 : 1 ); // clean stack depending if error is user triggered or not
 		self::overload( $stack, $file, $line  ); // switch line & file if overloaded method triggered the error
-		echo self::style(), PHP_EOL, '<pre class="debug error ',strtolower( self::$error[ $type ] ) ,'">', PHP_EOL, 
+		echo self::style(), PHP_EOL, '<pre class="debug error ', strtolower( self::$error[ $type ] ), '">', PHP_EOL, 
 			sprintf( '<b>%s</b>: %s in <b>%s</b> on line <b>%s</b>'  // print error
-				, self::$error[ $type ] ?: 'Error'
+				, self::$error[ $type ] ? self::$error[ $type ] : 'Error'
 				, $php_errormsg
 				, $file
 				, $line
@@ -115,7 +119,7 @@ class Debug {
 			exit;
 	}
 	static public    function shutdown () {
-		if ( self::$registered[ 'shutdown' ] && ( $error = error_get_last() ) && ( $error[ 'type' ] & E_ERROR |  E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR ) )
+		if ( self::$registered[ 'shutdown' ] && ( $error = error_get_last() ) && ( $error[ 'type' ] & ( E_ERROR |  E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR ) ) )
 			self::handler( $error[ 'type' ], $error[ 'message' ], $error[ 'file' ], $error[ 'line' ], null );
 	}
 	static public    function exception ( Exception $exception ) {
@@ -126,8 +130,8 @@ class Debug {
 		'debug'         => 'font-size:1em;padding:.5em;border-radius:5px'
 		, 'error'       => 'background:#eee'
 		, 'exception'   => 'color:#825'
-		//, 'parse'       => 'color:#F07'
-		//, 'compile'     => 'color:#F70'
+		, 'parse'       => 'color:#F07'
+		, 'compile'     => 'color:#F70'
 		, 'fatal'       => 'color:#F00'
 		, 'recoverable' => 'color:#F22'
 		, 'warning'     => 'color:#E44'
@@ -198,16 +202,18 @@ class Debug {
     ob_start();
     var_dump( $var );
     $export = ob_get_clean();
-    $export = preg_replace( '/\s*\bNULL\b/m', ' null', $export );
-    $export = preg_replace( '/\s*\bbool\((true|false)\)/m', ' $1', $export );
-    $export = preg_replace( '/\s*\bint\((\d+)\)/m', ' $1', $export );
-    $export = preg_replace( '/\s*\bfloat\(([\d.e-]+)\)/mi', ' $1', $export );
-    $export = preg_replace( '/\s*\bstring\(\d+\) /m', '', $export );
-    $export = preg_replace( '/object\((\w+)\)(#\d+ \(\d+\))/m', '$1$2', $export );
-    $export = preg_replace( '/=>\s*/m', '=> ', $export );
-    $export = preg_replace( '/\[([\w": ]+)\]/', '$1 ', $export );
+    $export = preg_replace( '/\s*\bNULL\b/m', ' null', $export ); // Cleanup NULL
+    $export = preg_replace( '/\s*\bbool\((true|false)\)/m', ' $1', $export ); // Cleanup booleans
+    $export = preg_replace( '/\s*\bint\((\d+)\)/m', ' $1', $export ); // Cleanup integers
+    $export = preg_replace( '/\s*\bfloat\(([\d.e-]+)\)/mi', ' $1', $export ); // Cleanup floats
+    $export = preg_replace( '/\s*\bstring\(\d+\) /m', '', $export ); // Cleanup strings
+    $export = preg_replace( '/object\((\w+)\)(#\d+) \(\d+\)/m', '$1$2', $export ); // Cleanup objects definition
+    //@todo array cleaning
+    $export = preg_replace( '/=>\s*/m', '=> ', $export ); // No new line between array/object keys and properties
+    $export = preg_replace( '/\[([\w": ]+)\]/', ', $1 ', $export ); // remove square brackets in array/object keys
+    $export = preg_replace( '/([{(]\s+), /', '$1  ', $export ); // remove first coma in array/object properties listing
     $export = preg_replace( '/\{\s+\}/m', '{}', $export );
-    $export = preg_replace( '/\s+$/m', '', $export );
+    $export = preg_replace( '/\s+$/m', '', $export ); // Trim end spaces/new line
     return $export;
 	}
 	static protected function simple_export ( $var ) {
@@ -221,7 +227,7 @@ class Debug {
       return $export;
     }
 		if ( is_object( $var ) )
-			return strstr( $export, '#', true );
+			return substr( $export, 0, strpos( $export, '#' ) ); // strstr( $export, '#', true );
 		return $export;
 	}
 	static protected function args_export ( $args ) {
@@ -234,16 +240,19 @@ class Debug {
 Debug::register();
 if ( ! function_exists( 'l' ) ) {
   function l () {
-    call_user_func_array( 'Debug::log', func_get_args() );
+    $args = func_get_args();
+    call_user_func_array( 'Debug::log', $args );
   }
 }
 if ( ! function_exists( 'd' ) ) {
   function d () {
-  	call_user_func_array( 'Debug::dump', func_get_args() );
+    $args = func_get_args();
+  	call_user_func_array( 'Debug::dump', $args );
   }
 }
 if ( ! function_exists( 'c' ) ) {
   function c () {
-  	call_user_func_array( 'Debug::chrono', func_get_args() );
+    $args = func_get_args();
+  	call_user_func_array( 'Debug::chrono', $args );
   }
 }
